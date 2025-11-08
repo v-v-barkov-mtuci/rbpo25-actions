@@ -1,9 +1,9 @@
 name: Pull Request
 
-#on:
-  #pull_request:
-  #  branches:
-  #    - master
+on:
+  pull_request:
+    branches:
+      - master
   #push:
   #  branches:
   #    - gh_actions
@@ -13,4 +13,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: echo "Hello world 5!"
+      - run: ./mvnw package
