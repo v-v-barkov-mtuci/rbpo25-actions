@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Vuln Example</title>
+</head>
+<body>
+<h2>Index</h2>
+
+<div>
+<a href="/tabnabbing/legal-site" target="_blank">Open /tabnabbing/legal-site</a>
+<button id="open-legal">Open /tabnabbing/legal-site via JS</button>
+</div>
+
+<div>
+<a href="/tabnabbing/legal-site?coop=1" target="_blank">Open /tabnabbing/legal-site?coop=1</a>
+<button id="open-legal-secure">Open /tabnabbing/legal-site?coop=1 via JS</button>
+</div>
+
+<div>
+    <p id="legal-wnd-status"></p>
+    <p id="legal-secure-wnd-status"></p>
+</div>
+
+<script src="/js/tabnabbing.js"></script>
+
+<script>
+    setClickEventHandler("#open-legal", "#legal-wnd-status", "/tabnabbing/legal-site", "https://mtuci.ru");
+    setClickEventHandler("#open-legal-secure", "#legal-secure-wnd-status", "/tabnabbing/legal-site?coop=1", "https://mtuci.ru");
+</script>
+
+</body>
+</html>

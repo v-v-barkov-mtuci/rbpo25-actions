@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Vuln Example</title>
+</head>
+<body>
+<h2>Index</h2>
+
+<div>
+<a href="/tabnabbing/reverse/evil-site" target="_blank">Open /tabnabbing/reverse/evil</a>
+<button id="open-evil">Open /tabnabbing/reverse/evil via JS</button>
+</div>
+
+<div>
+    <p id="evil-wnd-status"></p>
+</div>
+<script src="/js/tabnabbing.js"></script>
+<script>
+    setClickEventHandler("#open-evil", "#evil-wnd-status", "/tabnabbing/reverse/evil-site", null);
+</script>
+
+</body>
+</html>

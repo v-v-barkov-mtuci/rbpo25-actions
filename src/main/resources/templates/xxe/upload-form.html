@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>XXE Example</title>
+</head>
+<body>
+<h2>XXE Example</h2>
+
+<p th:utext="${data}"></p>
+
+<form action="/xxe/upload" method="POST" enctype="application/x-www-form-urlencoded">
+    <textarea name="data"></textarea>
+    <input type="checkbox" name="secure" />
+    <input type="submit" value="SEND!!!" />
+</form>
+
+</body>
+</html>

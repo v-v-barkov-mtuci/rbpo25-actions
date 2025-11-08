@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Vuln Example</title>
+</head>
+<body>
+<h2>Legal</h2>
+<p id="status"></p>
+<script>
+    const status = document.querySelector("#status");
+    if (window.opener) {
+        status.innerText = "window.opener доступен";
+    } else {
+        status.innerText = "window.opener не доступен";
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>XXE Example</title>
+</head>
+<body>
+<h2>CSRF Example</h2>
+
+<!--img src="/csrf/add?data=hacked"/-->
+
+<form action="/csrf/add" method="post" enctype="application/x-www-form-urlencoded">
+    <input type="hidden" name="data" value="HACKED!!!"/>
+    <input type="text" name="test"/>
+    <input type="submit"/>
+</form>
+
+</body>
+
+</html>
