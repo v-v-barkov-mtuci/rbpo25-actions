@@ -21,7 +21,7 @@ jobs:
           architecture: x64
       - run: chmod u+x ./mvnw
       - run: ./mvnw package
-      - uses: action/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: vuln
           path: ./target
