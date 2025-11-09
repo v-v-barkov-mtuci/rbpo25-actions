@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: eclipse-temurin:25.0.1_8-jdk
+    container: eclipse-temurin:21-jdk
     steps:
       - name: Getting source code
         uses: actions/checkout@v3
