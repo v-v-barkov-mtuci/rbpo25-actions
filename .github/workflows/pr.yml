@@ -4,9 +4,10 @@ on:
   pull_request:
     branches:
       - master
-  #push:
-  #  branches:
-  #    - gh_actions
+
+permissions:
+  contents: read
+  actions: read
 
 jobs:
   build:
@@ -21,3 +22,30 @@ jobs:
         with:
           name: vuln
           path: ./target
+
+  semgrep:
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep:latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Create reports directory
+        run: mkdir -p reports
+      
+      - name: Semgrep Security Scan with Autofix
+        run: |
+          semgrep scan \
+            --config "p/java" \
+            --config "p/secrets" \
+            --config "p/owasp-top-ten" \
+            --output reports/semgrep-results.sarif \
+            --sarif || true
+          
+      - name: Upload Semgrep Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: semgrep-results
+          path: reports/semgrep-results.sarif
+          retention-days: 14
