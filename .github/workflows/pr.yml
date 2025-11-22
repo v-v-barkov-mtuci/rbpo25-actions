@@ -1,0 +1,131 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: eclipse-temurin:21-jdk
+    steps:
+      - name: Getting source code
+        uses: actions/checkout@v3
+      - run: chmod u+x ./mvnw
+      - run: ./mvnw package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vuln
+          path: ./target
+
+  semgrep:
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep:latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Create reports directory
+        run: mkdir -p reports
+      
+      - name: Semgrep Security Scan with Autofix
+        run: |
+          semgrep scan \
+            --config "p/java" \
+            --config "p/secrets" \
+            --config "p/owasp-top-ten" \
+            --output reports/semgrep-results.sarif \
+            --sarif || true
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: reports/semgrep-results.sarif
+
+      - name: Upload Semgrep Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-results
+          path: reports/semgrep-results.sarif
+          retention-days: 14
+  
+  dependency_check:
+    needs: build
+    runs-on: ubuntu-latest
+    container: eclipse-temurin:21-jdk
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create reports directory
+        run: mkdir -p reports
+
+      - run: chmod u+x ./mvnw
+
+      - name: Run OWASP Dependency Check
+        run: |
+          ./mvnw org.owasp:dependency-check-maven:check \
+          -Dformat=HTML \
+          -DsuppressionFile=suppression.xml || true
+
+      - name: Upload Dependency Check Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-results
+          path: target/dependency-check-report.html
+          retention-days: 14
+
+  zap_scan:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Prepare ZAP Environment
+        run: |
+          sudo mkdir -p /zap/wrk
+          sudo chown -R $USER:$USER /zap
+          sudo chmod -R 755 /zap
+
+      - name: Download
+        uses: actions/download-artifact@v4
+        with:
+          name: vuln
+          path: target/
+
+      - name: Run application
+        run: java -jar ./target/vuln-0.0.1-SNAPSHOT.jar &
+      
+      - name: Wait for application to start
+        run: sleep 30
+
+      - name: ZAP Scan
+        uses: zaproxy/action-baseline@v0.9.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          docker_name: 'ghcr.io/zaproxy/zaproxy:stable'
+          target: 'http://localhost:8080/xss/reflected/'
+          cmd_options: '-I'
+          rules_file_name: '.zap/rules.tsv'
+          allow_issue_writing: false
+          fail_action: false
+
+      - name: Upload ZAP Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-results
+          path: |
+            zap-*
+            *.html
+          retention-days: 5
