@@ -72,14 +72,13 @@ jobs:
         run: |
           ./mvnw org.owasp:dependency-check-maven:check \
           -Dformat=HTML \
-          -DoutputDirectory=reports \
           -DsuppressionFile=suppression.xml || true
 
       - name: Upload Dependency Check Results
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-results
-          path: reports/dependency-check-report.html
+          path: target/dependency-check-report.html
           retention-days: 14
 
   zap_scan:
@@ -91,6 +90,12 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+
+      - name: Prepare ZAP Environment
+        run: |
+          mkdir -p /zap/wrk
+          chown -R $USER:$USER /zap
+          chmod -R 755 /zap
 
       - name: Download
         uses: actions/download-artifact@v4
