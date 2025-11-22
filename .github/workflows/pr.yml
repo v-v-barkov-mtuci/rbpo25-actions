@@ -93,9 +93,9 @@ jobs:
 
       - name: Prepare ZAP Environment
         run: |
-          mkdir -p /zap/wrk
-          chown -R $USER:$USER /zap
-          chmod -R 755 /zap
+          sudo mkdir -p /zap/wrk
+          sudo chown -R $USER:$USER /zap
+          sudo chmod -R 755 /zap
 
       - name: Download
         uses: actions/download-artifact@v4
