@@ -55,3 +55,29 @@ jobs:
           name: semgrep-results
           path: reports/semgrep-results.sarif
           retention-days: 14
+  
+  dependency_check:
+    needs: build
+    runs-on: ubuntu-latest
+    container: eclipse-temurin:21-jdk
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create reports directory
+        run: mkdir -p reports
+
+      - run: chmod u+x ./mvnw
+
+      - name: Run OWASP Dependency Check
+        run: |
+          ./mvnw org.owasp:dependency-check-maven:check \
+          -Dformat=HTML \
+          -DoutputDirectory=reports \
+          -DsuppressionFile=suppression.xml || true
+
+      - name: Upload Dependency Check Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-results
+          path: reports/dependency-check-report.html
+          retention-days: 14
